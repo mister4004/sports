@@ -1,61 +1,58 @@
 const fs = require('fs');
 const https = require('https');
+const express = require('express');
 const { Server } = require('socket.io');
 
-// Настройка HTTPS-сервера
+const app = express();
+const activeClients = {};
+
 const httpsServer = https.createServer({
-    key: fs.readFileSync('/etc/letsencrypt/live/ping-speed.ddns.net/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/ping-speed.ddns.net/fullchain.pem'),
-});
+  key: fs.readFileSync('/etc/letsencrypt/live/ping-speed.ddns.net/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/ping-speed.ddns.net/fullchain.pem'),
+}, app);
 
 const io = new Server(httpsServer, {
-    cors: {
-        origin: '*',
-    },
+  cors: { origin: "*", methods: ["GET", "POST"], credentials: true },
+  path: '/socket.io/',
 });
 
-const rooms = {};
-
 io.on('connection', (socket) => {
-    console.log(`New connection: ${socket.id}`);
+  console.log(`New connection: ${socket.id}`);
 
-    // Создание комнаты
-    socket.on('createRoom', ({ roomId, password }) => {
-        rooms[roomId] = { password, adminSocketId: socket.id };
-        console.log(`Room created: ${roomId}`);
-        socket.emit('roomCreated', { roomId });
-    });
+  socket.on('registerAdmin', ({ password }) => {
+    if (password === 'ejik2242') {
+      console.log('Admin authenticated');
+      socket.emit('adminRegistered');
+      // Отправляем список клиентов при входе
+      socket.emit('updateClientList', Object.keys(activeClients));
+    } else {
+      console.log('Admin authentication failed');
+      socket.disconnect(true);
+    }
+  });
 
-    // Присоединение клиента к комнате
-    socket.on('joinRoom', ({ roomId, password }) => {
-        const room = rooms[roomId];
-        if (!room || room.password !== password) {
-            socket.emit('joinError', 'Invalid room or password');
-            return;
-        }
-        room.clientSocketId = socket.id;
-        socket.join(roomId);
-        io.to(room.adminSocketId).emit('clientJoined', { clientId: socket.id });
-        console.log(`Client joined room: ${roomId}`);
-    });
+  socket.on('readyForOffer', () => {
+    console.log(`Client ${socket.id} is ready for offer`);
+    activeClients[socket.id] = true;
+    io.emit('updateClientList', Object.keys(activeClients));
+  });
 
-    // Проброс сигналов WebRTC
-    socket.on('webrtcSignal', ({ roomId, signal, to }) => {
-        io.to(to).emit('webrtcSignal', { signal, from: socket.id });
-    });
+  socket.on('webrtcSignal', ({ signal, targetId }) => {
+    const targetSocket = io.sockets.sockets.get(targetId);
+    if (targetSocket) {
+      targetSocket.emit('webrtcSignal', { signal, from: socket.id });
+    } else {
+      console.log(`Target client ${targetId} not found`);
+    }
+  });
 
-    // Отключение
-    socket.on('disconnect', () => {
-        Object.keys(rooms).forEach((roomId) => {
-            const room = rooms[roomId];
-            if (room.adminSocketId === socket.id || room.clientSocketId === socket.id) {
-                delete rooms[roomId];
-                console.log(`Room ${roomId} closed`);
-            }
-        });
-    });
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnected: ${socket.id}`);
+    delete activeClients[socket.id];
+    io.emit('updateClientList', Object.keys(activeClients));
+  });
 });
 
 httpsServer.listen(3001, () => {
-    console.log('WebSocket server running on https://ping-speed.ddns.net:3001');
+  console.log('HTTPS Server is running on https://ping-speed.ddns.net');
 });
