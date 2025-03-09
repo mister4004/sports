@@ -1,8 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from app.api_football import get_matches, get_match_details
-
+from api_football import get_matches, get_match_details
 app = FastAPI()
 
 # Добавление CORS middleware

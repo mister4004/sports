@@ -1,21 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { initTelegram, closeTelegramApp, expandTelegramApp, setHeaderColor } from './telegram';
+import { 
+    initTelegram, 
+    closeTelegramApp, 
+    expandTelegramApp, 
+    setHeaderColor,
+    saveDataToTelegram // Добавлен новый метод
+} from './telegram';
 
 function App() {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        // Инициализация Telegram Web App
         const { tg, user: telegramUser } = initTelegram();
+        
         if (telegramUser) {
             setUser(telegramUser);
+            // Пример сохранения данных через WebApp API вместо localStorage
+            saveDataToTelegram('lang', 'ru');
         }
 
-        // Настройка интерфейса
-        expandTelegramApp(); // Расширяем мини-приложение на весь экран
-        setHeaderColor('#ffffff'); // Устанавливаем цвет заголовка
+        expandTelegramApp();
+        setHeaderColor('#ffffff');
 
-        // Пример использования tg для отслеживания событий
         tg.onEvent('viewportChanged', () => {
             console.log('Размер окна изменился!');
         });

@@ -23,3 +23,9 @@ export const setHeaderColor = (color) => {
     const tg = window.Telegram.WebApp;
     tg.setHeaderColor(color);
 };
+
+// Для хранения данных вместо localStorage
+export const saveDataToTelegram = (key, value) => {
+    const tg = window.Telegram.WebApp;
+    tg.sendData(JSON.stringify({ [key]: value }));
+};
