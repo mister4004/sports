@@ -1,55 +1,38 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from api_football import get_matches, get_match_details
+from api_football import get_matches, get_match_details  # Убран импорт translate
+
 app = FastAPI()
 
-# Добавление CORS middleware
+# НАСТРОЙКА CORS (разрешаем GitHub Pages и локальный фронтенд)
+origins = [
+    "https://mister4004.github.io",
+    "http://localhost:3002",
+    "http://football.zapto.org"  # Ваш домен
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://football.zapto.org"],  # Разрешенный домен
-    allow_methods=["GET", "POST"],
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Модель для запроса перевода (заглушка)
-class TranslationRequest(BaseModel):
-    text: str
+# УДАЛЕНО: Модель TranslationRequest и эндпоинт /translate/
 
-@app.post("/translate/")
-async def translate(request: TranslationRequest):
-    """
-    Заглушка для эндпоинта перевода текста.
-    Возвращает оригинальный текст без перевода.
-    """
-    if not request.text:
-        raise HTTPException(status_code=400, detail="Текст не может быть пустым")
-
-    # Возвращаем оригинальный текст без перевода
-    return {"original": request.text, "translated": request.text}
-
+# ЭНДПОИНТ МАТЧЕЙ
 @app.get("/matches/")
 async def matches(date: str, language: str = "en"):
-    """
-    Эндпоинт для получения списка матчей на указанную дату.
-    Данные возвращаются на английском языке.
-    """
     try:
-        # Получаем данные о матчах
-        matches_data = get_matches(date)
-        return matches_data
+        return get_matches(date, language)  # Убран перевод
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка при получении матчей: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка матчей: {str(e)}")
 
+# ЭНДПОИНТ ДЕТАЛЕЙ МАТЧА
 @app.get("/match/{match_id}")
 async def match_details(match_id: int, language: str = "en"):
-    """
-    Эндпоинт для получения деталей матча по его ID.
-    Данные возвращаются на английском языке.
-    """
     try:
-        # Получаем данные о матче
-        match_data = get_match_details(match_id)
-        return match_data
+        return get_match_details(match_id, language)  # Убран перевод
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка при получении деталей матча: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Ошибка деталей: {str(e)}")
