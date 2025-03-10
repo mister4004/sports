@@ -1,0 +1,12 @@
+[Unit]
+Description=FastAPI Application
+After=network.target
+
+[Service]
+User=mister
+WorkingDirectory=/home/mister/project-root/backend
+ExecStart=/home/mister/project-root/backend/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
