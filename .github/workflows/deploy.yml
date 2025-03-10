@@ -1,0 +1,41 @@
+name: Deploy React App to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          cd frontend/football-mini-app
+          yarn install
+
+      - name: Build project
+        run: |
+          cd frontend/football-mini-app
+          yarn build
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: frontend/football-mini-app/build
+          branch: gh-pages
+          clean: true
+          single-commit: true
+          git-config-name: GitHub Actions
+          git-config-email: github-actions@github.com
+          # Важно - создаем .nojekyll файл чтобы отключить Jekyll
+          clean-exclude: |
+            .nojekyll
