@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
     initTelegram,
     closeTelegramApp,
-    expandTelegramApp,
-    setHeaderColor,
     saveDataToTelegram // Добавлен новый метод
 } from './telegram';
 
