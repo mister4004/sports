@@ -14,15 +14,7 @@ export const closeTelegramApp = () => {
     tg.close();
 };
 
-export const expandTelegramApp = () => {
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-};
-
-export const setHeaderColor = (color) => {
-    const tg = window.Telegram.WebApp;
-    tg.setHeaderColor(color);
-};
+// Удалены устаревшие методы expandTelegramApp и setHeaderColor
 
 // Для хранения данных вместо localStorage
 export const saveDataToTelegram = async (key, value) => {

@@ -9,16 +9,24 @@ function App() {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
-        const { tg, user: telegramUser } = initTelegram();
+        const { tg } = initTelegram();
+        const telegramUser = tg.initDataUnsafe?.user;
 
         // 1. Проверка наличия данных
         if (!telegramUser) {
-            tg.showAlert('Please open via Telegram!');
+            tg.showPopup({
+                title: 'Ошибка',
+                message: 'Откройте приложение через Telegram',
+                buttons: [{ type: 'ok' }]
+            });
             return;
         }
 
         // 2. Используйте правильные методы
-        tg.setBackgroundColor('#ffffff'); // вместо setHeaderColor
+        tg.setHeaderColor({
+            color: '#ffffff',
+            text_color: '#000000'
+        });
         tg.expand();
 
         // 3. Сохранение через CloudStorage
