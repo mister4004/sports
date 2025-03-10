@@ -36,6 +36,6 @@ jobs:
           single-commit: true
           git-config-name: GitHub Actions
           git-config-email: github-actions@github.com
-          # Важно - создаем .nojekyll файл чтобы отключить Jekyll
+          token: ${{ secrets.GH_PAT }}  # Используем PAT для аутентификации
           clean-exclude: |
             .nojekyll
