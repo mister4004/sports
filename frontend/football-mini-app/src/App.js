@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    initTelegram, 
-    closeTelegramApp, 
-    expandTelegramApp, 
+import {
+    initTelegram,
+    closeTelegramApp,
+    expandTelegramApp,
     setHeaderColor,
     saveDataToTelegram // Добавлен новый метод
 } from './telegram';
@@ -12,15 +12,23 @@ function App() {
 
     useEffect(() => {
         const { tg, user: telegramUser } = initTelegram();
-        
-        if (telegramUser) {
-            setUser(telegramUser);
-            // Пример сохранения данных через WebApp API вместо localStorage
-            saveDataToTelegram('lang', 'ru');
+
+        // 1. Проверка наличия данных
+        if (!telegramUser) {
+            tg.showAlert('Please open via Telegram!');
+            return;
         }
 
-        expandTelegramApp();
-        setHeaderColor('#ffffff');
+        // 2. Используйте правильные методы
+        tg.setBackgroundColor('#ffffff'); // вместо setHeaderColor
+        tg.expand();
+
+        // 3. Сохранение через CloudStorage
+        saveDataToTelegram('lang', 'ru')
+            .then(() => console.log('Language saved'))
+            .catch(console.error);
+
+        setUser(telegramUser);
 
         tg.onEvent('viewportChanged', () => {
             console.log('Размер окна изменился!');

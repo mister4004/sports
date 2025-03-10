@@ -25,7 +25,11 @@ export const setHeaderColor = (color) => {
 };
 
 // Для хранения данных вместо localStorage
-export const saveDataToTelegram = (key, value) => {
-    const tg = window.Telegram.WebApp;
-    tg.sendData(JSON.stringify({ [key]: value }));
+export const saveDataToTelegram = async (key, value) => {
+    try {
+        await window.Telegram.WebApp.CloudStorage.setItem(key, value);
+        console.log('Data saved to CloudStorage');
+    } catch (e) {
+        console.error('CloudStorage error:', e);
+    }
 };
