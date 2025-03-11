@@ -1,4 +1,4 @@
-name: Deploy React App to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -6,36 +6,14 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: |
-          cd frontend/football-mini-app
-          yarn install
-
-      - name: Build project
-        run: |
-          cd frontend/football-mini-app
-          yarn build
-
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          folder: frontend/football-mini-app/build
-          branch: gh-pages
-          clean: true
-          single-commit: true
-          git-config-name: GitHub Actions
-          git-config-email: github-actions@github.com
-          token: ${{ secrets.GH_PAT }}  # Используем PAT для аутентификации
-          clean-exclude: |
-            .nojekyll
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs  # Папка с файлами для деплоя
