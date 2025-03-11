@@ -1,7 +1,0 @@
-{
-  "name": "football-mini-app",
-  "version": "1.0.0",
-  "scripts": {
-    "deploy": "rm -rf docs && mkdir docs && cp public/* docs/ && touch docs/.nojekyll"
-  }
-}
