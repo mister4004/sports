@@ -8,20 +8,19 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout репозитория
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Создание .nojekyll
+      - name: Создание .nojekyll (если нужно)
         run: |
-          touch docs/.nojekyll
+          echo > docs/.nojekyll  # Создаем пустой файл .nojekyll
           git add docs/.nojekyll
-          git commit -m "Disable Jekyll"
+          git commit -m "Add .nojekyll" || echo "No changes"
           git push
 
-      - name: Деплой в GitHub Pages
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs  # Папка с файлами для деплоя
